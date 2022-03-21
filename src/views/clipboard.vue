@@ -27,6 +27,7 @@
       :class="{ selected: selectIndex === index }"
       @click="selectIndex = index"
       @dblclick="paste"
+      @click.right="showContextMenu(index)"
     )
       span.parts(
         v-for="partOfText in item.text.parts"
@@ -146,6 +147,10 @@ export default defineComponent({
       event.preventDefault();
       state.adjustHeight += event.movementY;
     };
+    const showContextMenu = (index: number) => {
+      state.selectIndex = index;
+      api.showContextMenu(paste, removeClipboardHistory);
+    };
     const closeWindow = api.closeWindow;
 
     // watch
@@ -217,6 +222,7 @@ export default defineComponent({
       paste,
       remove,
       resize,
+      showContextMenu,
       closeWindow,
     };
   },

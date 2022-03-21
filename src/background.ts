@@ -7,6 +7,8 @@ import {
   globalShortcut,
   ipcMain,
   Tray,
+  Menu,
+  MenuItem,
 } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
@@ -115,6 +117,24 @@ if (isDevelopment) {
 ipcMain.on('show:window', async () => {
   await createWindow();
   win?.show();
+});
+ipcMain.on('show:context-menu', (event) => {
+  const menu = new Menu();
+  menu.append(
+    new MenuItem({
+      label: 'Paste',
+      accelerator: 'Enter',
+      click: () => event.sender.send('paste:context-menu'),
+    })
+  );
+  menu.append(
+    new MenuItem({
+      label: 'Delete',
+      accelerator: 'Delete',
+      click: () => event.sender.send('remove:context-menu'),
+    })
+  );
+  menu.popup();
 });
 ipcMain.on('close:window', (event, action?: () => void) => {
   if (action) {
