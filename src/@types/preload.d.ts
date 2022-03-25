@@ -11,6 +11,7 @@ declare global {
         pasteAction: () => void,
         removeAction: () => void
       ) => void;
+      pressKey: (key: string, shiftKey: boolean) => void;
       closeWindow: () => void;
     };
   }
