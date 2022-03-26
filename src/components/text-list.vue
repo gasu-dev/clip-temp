@@ -25,7 +25,7 @@
       :key="item.time"
       :class="{ selected: selectIndex === index }"
       @click="selectIndex = index"
-      @dblclick="paste"
+      @dblclick="paste()"
       @click.right="showContextMenu(index)"
     )
       span.parts(
@@ -53,11 +53,11 @@
   .footer
     button(
       :disabled="!isSelected"
-      @click="paste"
+      @click="paste()"
     ) Paste
     button(
       :disabled="!isSelected"
-      @click="pasteAsPlainText"
+      @click="paste(true)"
     ) Paste as Plain Text
 </template>
 
@@ -151,8 +151,7 @@ export default defineComponent({
       }
       refsInput.focus();
     };
-    const paste = () => context.emit('paste');
-    const pasteAsPlainText = () => context.emit('paste', true);
+    const paste = (asPlainText = false) => context.emit('paste', asPlainText);
     const remove = () => context.emit('remove');
     const resize = (event: MouseEvent) => {
       if (event.buttons === 0 || !state.isResizing) {
@@ -243,7 +242,6 @@ export default defineComponent({
       isSelected,
       // methods
       paste,
-      pasteAsPlainText,
       remove,
       resize,
       showContextMenu,

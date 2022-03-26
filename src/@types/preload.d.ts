@@ -8,7 +8,7 @@ declare global {
       pasteClipboard: (index: number, asPlainText = false) => void;
       removeClipboard: (index: number) => void;
       showContextMenu: (
-        pasteAction: () => void,
+        pasteAction: (asPlainText?: boolean) => void,
         removeAction: () => void
       ) => void;
       pressKey: (key: string, shiftKey: boolean) => void;
