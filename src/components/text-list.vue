@@ -26,7 +26,7 @@
       :class="{ selected: selectIndex === index }"
       @click="selectIndex = index"
       @dblclick="paste()"
-      @click.right="showContextMenu(index)"
+      @click.right="showContextMenu"
     )
       span.parts(
         v-for="partOfText in item.text.parts"
@@ -138,7 +138,7 @@ export default defineComponent({
     });
 
     // methods
-    const { api } = window;
+    const { pressKey, showContextMenu } = window.api;
     const fixingFocus = (doPressKey = true) => {
       const refsInput = input.value;
       if (!refsInput || refsInput === document.activeElement) return;
@@ -146,7 +146,7 @@ export default defineComponent({
         const keyEvent = store.state.keyEvent;
         if (keyEvent.key.length > 1) return;
         keyEvent.preventDefault();
-        const listener = () => api.pressKey(keyEvent.key, keyEvent.shiftKey);
+        const listener = () => pressKey(keyEvent.key, keyEvent.shiftKey);
         refsInput.addEventListener('focus', listener, { once: true });
       }
       refsInput.focus();
@@ -161,12 +161,9 @@ export default defineComponent({
       event.preventDefault();
       state.adjustHeight += event.movementY;
     };
-    const showContextMenu = (index: number) => {
-      state.selectIndex = index;
-      api.showContextMenu(paste, remove);
-    };
 
     // watch
+    const { closeWindow } = window.api;
     watch(listOfText, (newValue) => {
       if (newValue.length > state.selectIndex) return;
       const adjust = newValue.length ? 1 : 0;
@@ -180,7 +177,7 @@ export default defineComponent({
     watch(
       () => store.state.keyEvent,
       (keyEvent) => {
-        if (keyEvent.key === HANDLING_KEYS.ESCAPE) return api.closeWindow();
+        if (keyEvent.key === HANDLING_KEYS.ESCAPE) return closeWindow();
         if (props.list.length <= state.selectIndex) return;
         const maxIndex = props.list.length - 1;
         switch (keyEvent.key) {
