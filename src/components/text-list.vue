@@ -28,10 +28,13 @@
       @dblclick="paste()"
       @click.right="showContextMenu"
     )
-      span.parts(
+      .parts(
         v-for="partOfText in item.text.parts"
         :class="{ highlight: partOfText.isMatched }"
-      ) {{ partOfText }}
+      )
+        span.new-line(
+          v-for='partOfText in partOfText.split(/\\r?\\n/)'
+        ) {{ partOfText }}
     .empty(v-if="isEmpty")
       template(v-if="filterWord.length") No matches found
       template(v-else) {{ isClipboard ? 'Clipboard history' : 'Template' }} is empty
@@ -272,13 +275,13 @@ export default defineComponent({
 }
 .list,
 .text {
-  overflow-y: auto;
   border: 1px solid;
   font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
   .parts {
     position: relative;
     z-index: 0;
     &.highlight {
+      overflow-y: visible;
       color: $highlight-font;
       &::after {
         position: absolute;
@@ -309,17 +312,32 @@ export default defineComponent({
 }
 .list {
   min-height: 1.5rem;
+  overflow-y: auto;
   .item {
-    height: 1.46rem;
-    padding: 0.25rem 0.5rem;
-    overflow-x: hidden;
-    overflow-y: visible;
+    display: flex;
+    align-items: center;
+    height: 1.45rem;
+    padding: 0 0.5rem;
+    overflow: hidden;
     font-size: 0.75rem;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     text-align: left;
     &:not(:last-child) {
       border-bottom: 1px solid;
+    }
+    .parts {
+      white-space: pre;
+      .new-line:not(:last-child) {
+        position: relative;
+        margin-right: 1.25rem;
+        &::after {
+          position: absolute;
+          top: 50%;
+          right: -0.75rem;
+          transform: translateY(-50%);
+          font-size: 1.25rem;
+          content: '⮠';
+        }
+      }
     }
   }
   .empty {
@@ -338,7 +356,7 @@ export default defineComponent({
   min-height: 1.75rem;
   margin-bottom: 0.5rem;
   padding: 0.25rem 0.5rem;
-  overflow-x: auto;
+  overflow: auto;
   font-size: 0.75rem;
   line-height: 1.5;
   text-align: left;

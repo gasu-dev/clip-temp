@@ -102,7 +102,7 @@ const createEditMenuTemplate = (sender: WebContents): MenuItemOptions[] => [
 export const createAppMenu = (sender: WebContents): Menu => {
   app.setAboutPanelOptions({
     applicationName: 'clip-temp',
-    applicationVersion: 'Version: 0.3.1',
+    applicationVersion: 'Version: 0.4.0',
     copyright: 'Copyright © 2022 freeApplications',
     iconPath: isDevelopment
       ? 'public/icon.png'
