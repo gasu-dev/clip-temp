@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { Clipboard, WindowEventType } from '~/@types';
+import { Clipboard, Template, WindowEventType } from '~/@types';
 
 // Expose ipcRenderer to the client
 contextBridge.exposeInMainWorld('api', {
+  // clipboard
   orderClipboard: () => {
     ipcRenderer.send('order:clipboard');
   },
@@ -17,6 +18,11 @@ contextBridge.exposeInMainWorld('api', {
   removeClipboard: (index: number) => {
     ipcRenderer.send('remove:clipboard', index);
   },
+  // template
+  saveTemplate: (title: string, text: string) => {
+    ipcRenderer.send('save:template', title, text);
+  },
+  // window
   showContextMenu: () => {
     ipcRenderer.send('show:context-menu');
   },
