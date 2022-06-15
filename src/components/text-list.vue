@@ -29,12 +29,14 @@
       @click.right="showContextMenu"
     )
       .parts(
-        v-for="partOfText in item.text.parts"
+        v-if="item.title.parts.length"
+        v-for="partOfText in item.title.parts"
         :class="{ highlight: partOfText.isMatched }"
       )
         span.new-line(
           v-for='partOfText in partOfText.split(/\\r?\\n/)'
         ) {{ partOfText }}
+      .parts(v-else) {{ item.title }}
     .empty(v-if="isEmpty")
       template(v-if="filterWord.length") No matches found
       template(v-else) {{ isClipboard ? 'Clipboard history' : 'Template' }} is empty
@@ -78,7 +80,7 @@ import {
 import IconFilter from '~/components/icons/filter.vue';
 import IconClear from '~/components/icons/clear.vue';
 import IconRemove from '~/components/icons/remove.vue';
-import Clipboard from '~/models/clipboard';
+import ClipTemp from '~/models/clip-temp';
 import { HANDLING_KEYS } from '~/renderer-constants';
 import store from '~/store';
 import { useRoute } from 'vue-router';
@@ -96,7 +98,7 @@ export default defineComponent({
       required: true,
     },
     list: {
-      type: Array as PropType<Clipboard[]>,
+      type: Array as PropType<ClipTemp[]>,
       required: true,
     },
   },
@@ -123,7 +125,7 @@ export default defineComponent({
     const isClipboard = computed(() => {
       return useRoute().name === 'clipboard';
     });
-    const listOfText = computed<Clipboard[]>(() => {
+    const listOfText = computed<ClipTemp[]>(() => {
       return props.list
         .filter((item) => item.match(state.filterWord))
         .sort((a, b) => a.compareTo(b));
