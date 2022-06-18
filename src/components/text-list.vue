@@ -228,6 +228,9 @@ export default defineComponent({
           case 'paste':
           case 'remove':
             context.emit(windowEvent.type);
+            break;
+          case 'reload':
+            fixingFocus(false);
         }
       }
     );
@@ -235,6 +238,7 @@ export default defineComponent({
 
     // lifecycle
     onMounted(() => {
+      store.commit('setWindowEvent', null);
       nextTick(() => fixingFocus(false));
     });
 
