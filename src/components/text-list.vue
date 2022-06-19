@@ -48,6 +48,10 @@
   )
     template(v-if="isSelected")
       .actions
+        icon-edit(
+          v-if="!isClipboard"
+          @click="edit"
+        )
         icon-remove(
           @click="remove"
         )
@@ -79,6 +83,7 @@ import {
 } from 'vue';
 import IconFilter from '~/components/icons/filter.vue';
 import IconClear from '~/components/icons/clear.vue';
+import IconEdit from '~/components/icons/edit.vue';
 import IconRemove from '~/components/icons/remove.vue';
 import ClipTemp from '~/models/clip-temp';
 import { HANDLING_KEYS } from '~/renderer-constants';
@@ -105,6 +110,7 @@ export default defineComponent({
   components: {
     IconFilter,
     IconClear,
+    IconEdit,
     IconRemove,
   },
   setup(props, context) {
@@ -156,6 +162,7 @@ export default defineComponent({
       refsInput.focus();
     };
     const paste = () => context.emit('paste');
+    const edit = () => context.emit('edit');
     const remove = () => context.emit('remove');
     const resize = (event: MouseEvent) => {
       if (event.buttons === 0 || !state.isResizing) {
@@ -174,9 +181,7 @@ export default defineComponent({
       state.selectIndex = newValue.length - adjust;
     });
     watch(originIndex, (newValue) => {
-      if (newValue > -1) {
-        context.emit('update:modelValue', newValue);
-      }
+      context.emit('update:modelValue', newValue);
     });
     watch(
       () => store.state.keyEvent,
@@ -226,6 +231,7 @@ export default defineComponent({
         if (!windowEvent || !isSelected.value) return;
         switch (windowEvent.type) {
           case 'paste':
+          case 'edit':
           case 'remove':
             context.emit(windowEvent.type);
             break;
@@ -258,6 +264,7 @@ export default defineComponent({
       isSelected,
       // methods
       paste,
+      edit,
       remove,
       resize,
       showContextMenu,

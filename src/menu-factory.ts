@@ -98,6 +98,10 @@ const createEditMenuTemplate = (sender: WebContents): MenuItemOptions[] => [
     click: () => sender.send('store:window-event', 'paste'),
   },
   {
+    label: 'Edit',
+    click: () => sender.send('store:window-event', 'edit'),
+  },
+  {
     label: 'Delete',
     accelerator: 'Delete',
     click: () => sender.send('store:window-event', 'remove'),
@@ -144,7 +148,7 @@ const createThemeMenu = (): MenuItemOptions[] => {
 export const createAppMenu = (sender: WebContents): Menu => {
   app.setAboutPanelOptions({
     applicationName: 'clip-temp',
-    applicationVersion: 'Version: 0.6.0',
+    applicationVersion: 'Version: 0.7.0',
     copyright: 'Copyright © 2022 freeApplications',
     iconPath: isDevelopment
       ? 'public/icon.png'
