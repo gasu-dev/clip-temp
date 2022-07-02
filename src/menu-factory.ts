@@ -15,7 +15,6 @@ const createMenuTemplate = (sender: WebContents): MenuItemOptions[] => [
     submenu: [
       {
         label: 'Exit',
-        accelerator: 'Esc',
         role: 'quit',
       },
     ],

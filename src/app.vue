@@ -1,6 +1,6 @@
 <template lang="pug">
 #nav
-  ul.tab-list
+  ul.tab-list(ref="tabList")
     li.tab-item
       router-link(to="/") clipboard
     li.tab-item
@@ -17,6 +17,7 @@ import {
   defineComponent,
   reactive,
   toRefs,
+  ref,
   computed,
   watch,
   nextTick,
@@ -24,7 +25,6 @@ import {
   onBeforeUnmount,
 } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { HANDLING_KEYS } from '~/renderer-constants';
 import store from '~/store';
 
 export default defineComponent({
@@ -37,6 +37,9 @@ export default defineComponent({
     });
     const { isReloading } = toRefs(state);
 
+    // refs
+    const tabList = ref<HTMLUListElement>();
+
     // computed
     const isTemplateEdit = computed(() => route.name === 'template-edit');
 
@@ -44,7 +47,7 @@ export default defineComponent({
     watch(
       () => store.state.windowEvent,
       (windowEvent) => {
-        if (windowEvent && windowEvent.type === 'reload') {
+        if (!isTemplateEdit.value && windowEvent?.type === 'reload') {
           state.isReloading = true;
           nextTick(() => (state.isReloading = false));
         }
@@ -53,13 +56,25 @@ export default defineComponent({
 
     // methods
     const onKeyDown = (keyEvent: KeyboardEvent) => {
-      if (keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey) return;
       if (
-        !isTemplateEdit.value &&
-        Object.values(HANDLING_KEYS).includes(keyEvent.key)
+        tabList.value &&
+        !keyEvent.altKey &&
+        keyEvent.ctrlKey &&
+        keyEvent.key === 'Tab'
       ) {
-        keyEvent.preventDefault();
+        const tabLinks: HTMLLinkElement[] = Array.from(
+          tabList.value?.querySelectorAll('.tab-item > a')
+        );
+        const lastIndex = tabLinks.length - 1;
+        let tabIndex = tabLinks.findIndex((link) =>
+          link.className.match(/router-link-active/)
+        );
+        tabIndex += keyEvent.shiftKey ? -1 : 1;
+        if (tabIndex < 0) tabIndex = lastIndex;
+        if (tabIndex > lastIndex) tabIndex = 0;
+        tabLinks[tabIndex].click();
       }
+      if (keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey) return;
       store.commit('setKeyEvent', keyEvent);
     };
 
@@ -76,6 +91,8 @@ export default defineComponent({
       // data
       isReloading,
       route,
+      // refs
+      tabList,
       // computed
       isTemplateEdit,
     };

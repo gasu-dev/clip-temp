@@ -186,6 +186,9 @@ export default defineComponent({
     watch(
       () => store.state.keyEvent,
       (keyEvent) => {
+        if (Object.values(HANDLING_KEYS).includes(keyEvent.key)) {
+          keyEvent.preventDefault();
+        }
         if (keyEvent.key === HANDLING_KEYS.ESCAPE) return closeWindow();
         if (props.list.length <= state.selectIndex) return;
         const maxIndex = props.list.length - 1;
