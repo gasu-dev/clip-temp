@@ -4,6 +4,7 @@ import {
   MenuItemConstructorOptions as MenuItemOptions,
   WebContents,
   nativeTheme,
+  ipcMain,
 } from 'electron';
 import path from 'path';
 
@@ -20,6 +21,7 @@ const createMenuTemplate = (sender: WebContents): MenuItemOptions[] => [
     ],
   },
   {
+    id: 'edit',
     label: 'Edit',
     submenu: createEditMenuTemplate(sender),
   },
@@ -90,22 +92,42 @@ const createMenuTemplate = (sender: WebContents): MenuItemOptions[] => [
   },
 ];
 
-const createEditMenuTemplate = (sender: WebContents): MenuItemOptions[] => [
+const createEditMenuTemplate = (
+  sender: WebContents,
+  editable: ('paste' | 'edit' | 'delete')[] = []
+): MenuItemOptions[] => [
   {
     label: 'Paste',
     accelerator: 'Enter',
     click: () => sender.send('store:window-event', 'paste'),
+    enabled: editable.includes('paste'),
   },
   {
     label: 'Edit',
     click: () => sender.send('store:window-event', 'edit'),
+    enabled: editable.includes('edit'),
   },
   {
     label: 'Delete',
     accelerator: 'Delete',
     click: () => sender.send('store:window-event', 'remove'),
+    enabled: editable.includes('delete'),
   },
 ];
+
+ipcMain.on(
+  'change:editable',
+  (event, editable: ('paste' | 'edit' | 'delete')[]) => {
+    const menu = Menu.getApplicationMenu();
+    if (menu === null) return;
+    const editMenu = menu.getMenuItemById('edit');
+    if (editMenu === null || !editMenu.submenu) return;
+    editMenu.submenu.items.forEach((item) => {
+      const label = item.label.toLowerCase();
+      item.enabled = editable.includes(label as never);
+    });
+  }
+);
 
 const createThemeMenu = (): MenuItemOptions[] => {
   const themeMenu = [
@@ -156,6 +178,9 @@ export const createAppMenu = (sender: WebContents): Menu => {
   return Menu.buildFromTemplate(createMenuTemplate(sender));
 };
 
-export const createContextMenu = (sender: WebContents): Menu => {
-  return Menu.buildFromTemplate(createEditMenuTemplate(sender));
+export const createContextMenu = (
+  sender: WebContents,
+  editable: ('paste' | 'edit' | 'delete')[]
+): Menu => {
+  return Menu.buildFromTemplate(createEditMenuTemplate(sender, editable));
 };

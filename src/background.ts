@@ -128,8 +128,8 @@ if (isDevelopment) {
   }
 }
 
-ipcMain.on('show:context-menu', (event) => {
-  createContextMenu(event.sender).popup();
+ipcMain.on('show:context-menu', (event, editable) => {
+  createContextMenu(event.sender, editable).popup();
 });
 ipcMain.on('press:key', (event, key: string, shiftKey: boolean) => {
   try {

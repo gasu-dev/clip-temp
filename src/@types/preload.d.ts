@@ -20,7 +20,8 @@ declare global {
       pasteTemplate: (index: number) => void;
       removeTemplate: (index: number) => void;
       // window
-      showContextMenu: () => void;
+      showContextMenu: (editable: ('paste' | 'edit' | 'delete')[]) => void;
+      changeEditable: (editable: ('paste' | 'edit' | 'delete')[]) => void;
       pressKey: (key: string, shiftKey: boolean) => void;
       closeWindow: () => void;
       storeWindowEvent: (

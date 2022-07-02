@@ -26,7 +26,7 @@
       :class="{ selected: selectIndex === index }"
       @click="selectIndex = index"
       @dblclick="paste()"
-      @click.right="showContextMenu"
+      @click.right="selectIndex = index; showContextMenu(editable)"
     )
       .parts(
         v-if="item.title.parts.length"
@@ -77,6 +77,7 @@ import {
   ref,
   toRefs,
   computed,
+  ComputedRef,
   watch,
   onMounted,
   nextTick,
@@ -128,8 +129,12 @@ export default defineComponent({
     const list = ref<HTMLDivElement>();
 
     // computed
+    const route = useRoute();
     const isClipboard = computed(() => {
-      return useRoute().name === 'clipboard';
+      return route && route.name === 'clipboard';
+    });
+    const isTemplate = computed(() => {
+      return route && route.name === 'template';
     });
     const listOfText = computed<ClipTemp[]>(() => {
       return props.list
@@ -146,6 +151,15 @@ export default defineComponent({
         item.equals(listOfText.value[state.selectIndex])
       );
     });
+    const editable: ComputedRef<('paste' | 'edit' | 'delete')[]> = computed(
+      () => {
+        const editable = isSelected.value ? ['paste', 'delete'] : [];
+        if (isTemplate.value && isSelected.value) {
+          editable.push('edit');
+        }
+        return editable as never;
+      }
+    );
 
     // methods
     const { pressKey, showContextMenu } = window.api;
@@ -174,7 +188,7 @@ export default defineComponent({
     };
 
     // watch
-    const { closeWindow } = window.api;
+    const { changeEditable, closeWindow } = window.api;
     watch(listOfText, (newValue) => {
       if (newValue.length > state.selectIndex) return;
       const adjust = newValue.length ? 1 : 0;
@@ -182,6 +196,9 @@ export default defineComponent({
     });
     watch(originIndex, (newValue) => {
       context.emit('update:modelValue', newValue);
+    });
+    watch(editable, (newValue) => {
+      changeEditable(newValue as never);
     });
     watch(
       () => store.state.keyEvent,
@@ -265,6 +282,7 @@ export default defineComponent({
       listOfText,
       isEmpty,
       isSelected,
+      editable,
       // methods
       paste,
       edit,

@@ -40,8 +40,11 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.send('remove:template', index);
   },
   // window
-  showContextMenu: () => {
-    ipcRenderer.send('show:context-menu');
+  showContextMenu: (editable: ('paste' | 'edit' | 'delete')[]) => {
+    ipcRenderer.send('show:context-menu', editable);
+  },
+  changeEditable: (editable: ('paste' | 'edit' | 'delete')[]) => {
+    ipcRenderer.send('change:editable', editable);
   },
   pressKey: (key: string, shiftKey: boolean) => {
     ipcRenderer.send('press:key', key, shiftKey);
